@@ -1,25 +1,25 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@common/exceptions/base.exception';
 import { EnvConfig } from '@config/env.config';
 import { UserRepository } from '@features/users/repositories/user.repository.interface';
+import { EmailService } from '@infrastructure/email/email.service';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+  VerifyEmailDto,
+} from '../dto/auth.dto';
+import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 import { TokenRevocationService } from './token-revocation.service';
-import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
-import { EmailService } from '@infrastructure/email/email.service';
-import {
-  UnauthorizedException,
-  ConflictException,
-  NotFoundException,
-  BadRequestException,
-} from '@common/exceptions/base.exception';
-import {
-  RegisterDto,
-  LoginDto,
-  VerifyEmailDto,
-  ForgotPasswordDto,
-  ResetPasswordDto,
-} from '../dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -53,21 +53,14 @@ export class AuthService {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
-    await this.userRepository.setEmailVerificationToken(
-      user.id,
-      verificationToken,
-      expiresAt,
-    );
+    await this.userRepository.setEmailVerificationToken(user.id, verificationToken, expiresAt);
 
-    this.emailService
-      .sendVerificationEmail(user.email, verificationToken)
-      .catch((error) => {
-        this.logger.error(`Failed to send verification email: ${error.message}`);
-      });
+    this.emailService.sendVerificationEmail(user.email, verificationToken).catch((error) => {
+      this.logger.error(`Failed to send verification email: ${error.message}`);
+    });
 
     return {
-      message:
-        'Registration successful. Please check your email to verify your account.',
+      message: 'Registration successful. Please check your email to verify your account.',
     };
   }
 
@@ -77,32 +70,21 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await this.passwordService.compare(
-      dto.password,
-      user.password,
-    );
+    const isPasswordValid = await this.passwordService.compare(dto.password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const emailVerificationRequired = this.configService.get(
-      'EMAIL_VERIFICATION_REQUIRED',
-      { infer: true },
-    );
+    const emailVerificationRequired = this.configService.get('EMAIL_VERIFICATION_REQUIRED', {
+      infer: true,
+    });
     if (emailVerificationRequired && !user.emailVerified) {
-      throw new UnauthorizedException(
-        'Please verify your email before logging in',
-      );
+      throw new UnauthorizedException('Please verify your email before logging in');
     }
 
-    const tokenPair = await this.tokenService.generateTokenPair(
-      user.id,
-      user.email,
-    );
+    const tokenPair = await this.tokenService.generateTokenPair(user.id, user.email);
 
-    const hashedRefreshToken = await this.passwordService.hash(
-      tokenPair.refreshToken,
-    );
+    const hashedRefreshToken = await this.passwordService.hash(tokenPair.refreshToken);
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
@@ -126,9 +108,7 @@ export class AuthService {
   }
 
   async verifyEmail(dto: VerifyEmailDto) {
-    const user = await this.userRepository.findByEmailVerificationToken(
-      dto.token,
-    );
+    const user = await this.userRepository.findByEmailVerificationToken(dto.token);
     if (!user) {
       throw new BadRequestException('Invalid or expired verification token');
     }
@@ -152,17 +132,11 @@ export class AuthService {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1);
 
-    await this.userRepository.setPasswordResetToken(
-      user.id,
-      resetToken,
-      expiresAt,
-    );
+    await this.userRepository.setPasswordResetToken(user.id, resetToken, expiresAt);
 
-    this.emailService
-      .sendPasswordResetEmail(user.email, resetToken)
-      .catch((error) => {
-        this.logger.error(`Failed to send password reset email: ${error.message}`);
-      });
+    this.emailService.sendPasswordResetEmail(user.email, resetToken).catch((error) => {
+      this.logger.error(`Failed to send password reset email: ${error.message}`);
+    });
 
     return { message: 'If the email exists, a reset link has been sent' };
   }
@@ -201,30 +175,17 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const isValid = await this.passwordService.compare(
-      oldRefreshToken,
-      storedToken.token,
-    );
+    const isValid = await this.passwordService.compare(oldRefreshToken, storedToken.token);
     if (!isValid) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    await this.tokenRevocationService.revokeToken(
-      oldJti,
-      userId,
-      storedToken.expiresAt,
-      'refresh',
-    );
+    await this.tokenRevocationService.revokeToken(oldJti, userId, storedToken.expiresAt, 'refresh');
     await this.refreshTokenRepository.deleteByJti(oldJti);
 
-    const tokenPair = await this.tokenService.generateTokenPair(
-      user.id,
-      user.email,
-    );
+    const tokenPair = await this.tokenService.generateTokenPair(user.id, user.email);
 
-    const hashedRefreshToken = await this.passwordService.hash(
-      tokenPair.refreshToken,
-    );
+    const hashedRefreshToken = await this.passwordService.hash(tokenPair.refreshToken);
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
@@ -247,30 +208,9 @@ export class AuthService {
       throw new NotFoundException('Token not found');
     }
 
-    await this.tokenRevocationService.revokeToken(
-      jti,
-      userId,
-      token.expiresAt,
-      'logout',
-    );
+    await this.tokenRevocationService.revokeToken(jti, userId, token.expiresAt, 'logout');
     await this.refreshTokenRepository.deleteByJti(jti);
 
     return { message: 'Token revoked successfully' };
-  }
-
-  async getMe(userId: string) {
-    const user = await this.userRepository.findById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
   }
 }

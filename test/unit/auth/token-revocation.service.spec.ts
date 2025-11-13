@@ -1,15 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { TokenRevocationService } from '@features/auth/services/token-revocation.service';
-import { TokenService } from '@features/auth/services/token.service';
-import { RedisService } from '@shared/redis/redis.service';
 import { RevokedTokenRepository } from '@features/auth/repositories/revoked-token.repository';
+import { TokenService } from '@features/auth/services/token.service';
+import { TokenRevocationService } from '@features/auth/services/token-revocation.service';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+import { RedisService } from '@shared/redis/redis.service';
 
 describe('TokenRevocationService', () => {
   let service: TokenRevocationService;
-  let redisService: RedisService;
-  let revokedTokenRepo: RevokedTokenRepository;
-  let tokenService: TokenService;
+  let _redisService: RedisService;
+  let _revokedTokenRepo: RevokedTokenRepository;
+  let _tokenService: TokenService;
 
   const mockRedisService = {
     set: jest.fn().mockResolvedValue('OK'),
@@ -81,17 +81,8 @@ describe('TokenRevocationService', () => {
 
       await service.revokeToken(jti, userId, expiresAt, reason);
 
-      expect(mockRedisService.set).toHaveBeenCalledWith(
-        `revoked:${jti}`,
-        '1',
-        expect.any(Number),
-      );
-      expect(mockRevokedTokenRepo.create).toHaveBeenCalledWith(
-        userId,
-        jti,
-        expiresAt,
-        reason,
-      );
+      expect(mockRedisService.set).toHaveBeenCalledWith(`revoked:${jti}`, '1', expect.any(Number));
+      expect(mockRevokedTokenRepo.create).toHaveBeenCalledWith(userId, jti, expiresAt, reason);
     });
 
     it('should calculate TTL correctly', async () => {
@@ -126,12 +117,7 @@ describe('TokenRevocationService', () => {
 
       await service.revokeToken(jti, userId, expiresAt);
 
-      expect(mockRevokedTokenRepo.create).toHaveBeenCalledWith(
-        userId,
-        jti,
-        expiresAt,
-        undefined,
-      );
+      expect(mockRevokedTokenRepo.create).toHaveBeenCalledWith(userId, jti, expiresAt, undefined);
     });
   });
 

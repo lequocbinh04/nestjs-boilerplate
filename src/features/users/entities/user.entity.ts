@@ -17,14 +17,14 @@ export class UserEntity {
   }
 
   isEmailVerificationValid(): boolean {
-    if (!this.emailVerificationToken || !this.emailVerificationExpires) {
+    if (!(this.emailVerificationToken && this.emailVerificationExpires)) {
       return false;
     }
     return new Date() < this.emailVerificationExpires;
   }
 
   isPasswordResetValid(): boolean {
-    if (!this.passwordResetToken || !this.passwordResetExpires) {
+    if (!(this.passwordResetToken && this.passwordResetExpires)) {
       return false;
     }
     return new Date() < this.passwordResetExpires;

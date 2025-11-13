@@ -9,11 +9,7 @@ export class PrismaUserRepository extends UserRepository {
     super();
   }
 
-  async create(data: {
-    email: string;
-    password: string;
-    name?: string;
-  }): Promise<UserEntity> {
+  async create(data: { email: string; password: string; name?: string }): Promise<UserEntity> {
     const user = await this.prisma.user.create({
       data,
     });
@@ -62,11 +58,7 @@ export class PrismaUserRepository extends UserRepository {
     });
   }
 
-  async setEmailVerificationToken(
-    userId: string,
-    token: string,
-    expiresAt: Date,
-  ): Promise<void> {
+  async setEmailVerificationToken(userId: string, token: string, expiresAt: Date): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
       data: {
@@ -76,11 +68,7 @@ export class PrismaUserRepository extends UserRepository {
     });
   }
 
-  async setPasswordResetToken(
-    userId: string,
-    token: string,
-    expiresAt: Date,
-  ): Promise<void> {
+  async setPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
       data: {

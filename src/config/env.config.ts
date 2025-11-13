@@ -19,7 +19,9 @@ export const EnvSchema = z.object({
   // JWT
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   JWT_ACCESS_TOKEN_EXPIRATION: z.string().default('15m'),
-  JWT_REFRESH_TOKEN_SECRET: z.string().min(32, 'REFRESH_TOKEN_SECRET must be at least 32 characters'),
+  JWT_REFRESH_TOKEN_SECRET: z
+    .string()
+    .min(32, 'REFRESH_TOKEN_SECRET must be at least 32 characters'),
   JWT_REFRESH_TOKEN_EXPIRATION: z.string().default('7d'),
 
   // Email

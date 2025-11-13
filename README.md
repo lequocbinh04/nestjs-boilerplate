@@ -1,5 +1,7 @@
 # NestJS Authentication Boilerplate
 
+Status: ❌ Not Implement Done Yet  
+
 Production-ready NestJS authentication boilerplate with Clean Architecture, SOLID principles, and comprehensive security features.
 
 ## Features
@@ -180,8 +182,56 @@ npm run prisma:deploy          # Apply migrations (prod)
 npm run prisma:studio          # Open Prisma Studio
 
 # Code Quality
-npm run lint                   # Run ESLint
-npm run format                 # Format code with Prettier
+npm run check                  # Lint + format + organize imports (Biome)
+npm run lint                   # Lint with auto-fix
+npm run format                 # Format code
+npm run check:ci               # CI mode (fails on issues)
+```
+
+## Code Quality & Git Hooks
+
+This project uses automated code quality tools:
+
+- **Biome** - Fast linter and formatter (25x faster than Prettier)
+- **lint-staged** - Run checks on staged files only
+- **Husky** - Git hooks automation
+- **commitlint** - Enforce conventional commit messages
+
+### Pre-commit Hook
+
+Automatically runs before each commit:
+- ✅ Biome linting and formatting on staged files
+- ✅ TypeScript type checking
+- ✅ 200-line file size limit check
+
+### Commit Message Format
+
+Follows [Conventional Commits](https://www.conventionalcommits.org/):
+
+```bash
+<type>(<scope>): <subject>
+
+# Examples:
+feat(auth): Add email verification flow
+fix(users): Resolve password hashing issue
+docs: Update README
+```
+
+See [COMMIT_CONVENTION.md](./COMMIT_CONVENTION.md) for full guidelines.
+
+### Available Types
+
+- **feat** - New feature
+- **fix** - Bug fix
+- **docs** - Documentation
+- **style** - Code style
+- **refactor** - Code refactoring
+- **perf** - Performance
+- **test** - Tests
+- **build** - Build system
+- **ci** - CI/CD
+- **chore** - Maintenance
+
 ```
 
 ## Testing

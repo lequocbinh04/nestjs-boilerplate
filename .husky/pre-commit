@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Run lint-staged (Biome + TypeScript check)
+npx lint-staged
+
+# Check 200-line limit
+node scripts/check-file-size.js

@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../../../src/app.module';
 import { TestDatabase } from '../../helpers/test-database';
@@ -58,10 +58,7 @@ describe('Auth Endpoints (Integration)', () => {
       };
 
       // First registration
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(userData)
-        .expect(201);
+      await request(app.getHttpServer()).post('/auth/register').send(userData).expect(201);
 
       // Second registration with same email
       const response = await request(app.getHttpServer())
@@ -113,13 +110,11 @@ describe('Auth Endpoints (Integration)', () => {
   describe('POST /auth/login', () => {
     beforeEach(async () => {
       // Create a verified user for login tests
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'loginuser@example.com',
-          password: 'Password123',
-          name: 'Login User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'loginuser@example.com',
+        password: 'Password123',
+        name: 'Login User',
+      });
 
       // Manually verify user in database
       const prisma = testDb.getPrisma();
@@ -184,12 +179,10 @@ describe('Auth Endpoints (Integration)', () => {
     let verificationToken: string;
 
     beforeEach(async () => {
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'verify@example.com',
-          password: 'Password123',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'verify@example.com',
+        password: 'Password123',
+      });
 
       // Get verification token from database
       const prisma = testDb.getPrisma();
@@ -245,12 +238,10 @@ describe('Auth Endpoints (Integration)', () => {
 
   describe('POST /auth/forgot-password', () => {
     beforeEach(async () => {
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'forgot@example.com',
-          password: 'Password123',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'forgot@example.com',
+        password: 'Password123',
+      });
     });
 
     it('should send password reset email for existing user', async () => {
@@ -404,12 +395,10 @@ describe('Auth Endpoints (Integration)', () => {
         data: { emailVerified: true },
       });
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: 'refresh@example.com',
-          password: 'Password123',
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: 'refresh@example.com',
+        password: 'Password123',
+      });
 
       refreshToken = loginResponse.body.data.refreshToken;
     });
@@ -466,12 +455,10 @@ describe('Auth Endpoints (Integration)', () => {
         data: { emailVerified: true },
       });
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: 'revoke@example.com',
-          password: 'Password123',
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: 'revoke@example.com',
+        password: 'Password123',
+      });
 
       accessToken = loginResponse.body.data.accessToken;
     });
@@ -497,13 +484,13 @@ describe('Auth Endpoints (Integration)', () => {
         .expect(200);
 
       await request(app.getHttpServer())
-        .get('/auth/me')
+        .get('/users/me')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(401);
     });
   });
 
-  describe('GET /auth/me', () => {
+  describe('GET /users/me', () => {
     let accessToken: string;
 
     beforeEach(async () => {
@@ -519,19 +506,17 @@ describe('Auth Endpoints (Integration)', () => {
         data: { emailVerified: true },
       });
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: 'me@example.com',
-          password: 'Password123',
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: 'me@example.com',
+        password: 'Password123',
+      });
 
       accessToken = loginResponse.body.data.accessToken;
     });
 
     it('should get current user profile', async () => {
       const response = await request(app.getHttpServer())
-        .get('/auth/me')
+        .get('/users/me')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
@@ -542,12 +527,12 @@ describe('Auth Endpoints (Integration)', () => {
     });
 
     it('should return 401 without authorization header', async () => {
-      await request(app.getHttpServer()).get('/auth/me').expect(401);
+      await request(app.getHttpServer()).get('/users/me').expect(401);
     });
 
     it('should return 401 with invalid token', async () => {
       await request(app.getHttpServer())
-        .get('/auth/me')
+        .get('/users/me')
         .set('Authorization', 'Bearer invalid-token')
         .expect(401);
     });

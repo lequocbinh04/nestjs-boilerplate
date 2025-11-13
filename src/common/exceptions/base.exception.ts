@@ -39,7 +39,10 @@ export class NotFoundException extends BaseException {
 }
 
 export class ConflictException extends BaseException {
-  constructor(message = 'Resource already exists', errors?: Array<{ field: string; message: string }>) {
+  constructor(
+    message = 'Resource already exists',
+    errors?: Array<{ field: string; message: string }>,
+  ) {
     super(message, HttpStatus.CONFLICT, errors);
   }
 }

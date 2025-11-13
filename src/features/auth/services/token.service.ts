@@ -1,8 +1,8 @@
+import { randomUUID } from 'node:crypto';
+import { EnvConfig } from '@config/env.config';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { EnvConfig } from '@config/env.config';
-import { randomUUID } from 'crypto';
 
 export interface TokenPayload {
   sub: string;
@@ -42,11 +42,7 @@ export class TokenService {
     };
   }
 
-  private async generateAccessToken(
-    userId: string,
-    email: string,
-    jti: string,
-  ): Promise<string> {
+  private async generateAccessToken(userId: string, email: string, jti: string): Promise<string> {
     const payload: TokenPayload = {
       sub: userId,
       email,
@@ -60,11 +56,7 @@ export class TokenService {
     });
   }
 
-  private async generateRefreshToken(
-    userId: string,
-    email: string,
-    jti: string,
-  ): Promise<string> {
+  private async generateRefreshToken(userId: string, email: string, jti: string): Promise<string> {
     const payload: TokenPayload = {
       sub: userId,
       email,
@@ -90,18 +82,23 @@ export class TokenService {
     });
   }
 
-  decodeToken(token: string): any {
-    return this.jwtService.decode(token);
+  decodeToken(token: string): TokenPayload | null {
+    return this.jwtService.decode(token) as TokenPayload | null;
   }
 
   getTokenExpiration(expiresIn: string): number {
     const match = expiresIn.match(/^(\d+)([smhd])$/);
     if (!match) return 900; // default 15 min
 
-    const value = parseInt(match[1]);
+    const value = parseInt(match[1], 10);
     const unit = match[2] as 's' | 'm' | 'h' | 'd';
 
-    const multipliers: Record<string, number> = { s: 1, m: 60, h: 3600, d: 86400 };
+    const multipliers: Record<string, number> = {
+      s: 1,
+      m: 60,
+      h: 3600,
+      d: 86400,
+    };
     return value * (multipliers[unit] || 60);
   }
 }

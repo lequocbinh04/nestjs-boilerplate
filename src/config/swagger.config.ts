@@ -17,7 +17,7 @@ export function setupSwagger(app: INestApplication): void {
       },
       'JWT-auth',
     )
-    .addTag('Auth', 'Authentication endpoints')
+    .addTag('Authentication', 'Authentication endpoints')
     .addTag('Users', 'User management endpoints')
     .addTag('Health', 'Health check endpoints')
     .build();

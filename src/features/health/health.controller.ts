@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
 import { PrismaService } from '@shared/database/prisma.service';
 import { RedisHealthIndicator } from '@shared/redis/redis.health';
@@ -29,9 +29,7 @@ export class HealthController {
   @HealthCheck()
   @ApiOperation({ summary: 'Database health check' })
   checkDatabase() {
-    return this.health.check([
-      () => this.prismaHealth.pingCheck('database', this.prismaService),
-    ]);
+    return this.health.check([() => this.prismaHealth.pingCheck('database', this.prismaService)]);
   }
 
   @Get('redis')

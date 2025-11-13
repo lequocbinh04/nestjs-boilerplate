@@ -10,29 +10,35 @@ export class LoggerService implements NestLoggerService {
 
   log(message: string, context?: string) {
     const ctx = context || this.context;
+    // biome-ignore lint/suspicious/noConsole: Logger service uses console
     console.log(this.formatMessage('LOG', message, ctx));
   }
 
   error(message: string, trace?: string, context?: string) {
     const ctx = context || this.context;
+    // biome-ignore lint/suspicious/noConsole: Logger service uses console
     console.error(this.formatMessage('ERROR', message, ctx));
     if (trace) {
+      // biome-ignore lint/suspicious/noConsole: Logger service uses console
       console.error(trace);
     }
   }
 
   warn(message: string, context?: string) {
     const ctx = context || this.context;
+    // biome-ignore lint/suspicious/noConsole: Logger service uses console
     console.warn(this.formatMessage('WARN', message, ctx));
   }
 
   debug(message: string, context?: string) {
     const ctx = context || this.context;
+    // biome-ignore lint/suspicious/noConsole: Logger service uses console
     console.debug(this.formatMessage('DEBUG', message, ctx));
   }
 
   verbose(message: string, context?: string) {
     const ctx = context || this.context;
+    // biome-ignore lint/suspicious/noConsole: Logger service uses console
     console.log(this.formatMessage('VERBOSE', message, ctx));
   }
 

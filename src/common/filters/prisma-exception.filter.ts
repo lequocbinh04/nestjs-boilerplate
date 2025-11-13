@@ -1,6 +1,6 @@
-import { Catch, ExceptionFilter, ArgumentsHost, HttpStatus, Logger } from '@nestjs/common';
-import { Response } from 'express';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { Response } from 'express';
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaExceptionFilter implements ExceptionFilter {
@@ -44,7 +44,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     });
   }
 
-  private getErrorMessage(code: string, meta: any): string {
+  private getErrorMessage(code: string, meta: Record<string, unknown> | undefined): string {
     const messages: Record<string, string> = {
       P2002: `Resource already exists. Field: ${meta?.target || 'unknown'}`,
       P2025: 'Resource not found',

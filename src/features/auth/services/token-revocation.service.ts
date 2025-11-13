@@ -1,9 +1,9 @@
+import { EnvConfig } from '@config/env.config';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '@shared/redis/redis.service';
 import { RevokedTokenRepository } from '../repositories/revoked-token.repository';
 import { TokenService } from './token.service';
-import { EnvConfig } from '@config/env.config';
 
 @Injectable()
 export class TokenRevocationService {
@@ -14,12 +14,7 @@ export class TokenRevocationService {
     private configService: ConfigService<EnvConfig>,
   ) {}
 
-  async revokeToken(
-    jti: string,
-    userId: string,
-    expiresAt: Date,
-    reason?: string,
-  ): Promise<void> {
+  async revokeToken(jti: string, userId: string, expiresAt: Date, reason?: string): Promise<void> {
     const now = new Date();
     const ttl = Math.floor((expiresAt.getTime() - now.getTime()) / 1000);
 

@@ -1,19 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@common/exceptions/base.exception';
+import { RefreshTokenRepository } from '@features/auth/repositories/refresh-token.repository';
 import { AuthService } from '@features/auth/services/auth.service';
 import { PasswordService } from '@features/auth/services/password.service';
 import { TokenService } from '@features/auth/services/token.service';
 import { TokenRevocationService } from '@features/auth/services/token-revocation.service';
-import { UserRepository } from '@features/users/repositories/user.repository.interface';
-import { RefreshTokenRepository } from '@features/auth/repositories/refresh-token.repository';
-import { EmailService } from '@infrastructure/email/email.service';
 import { UserEntity } from '@features/users/entities/user.entity';
-import {
-  UnauthorizedException,
-  ConflictException,
-  NotFoundException,
-  BadRequestException,
-} from '@common/exceptions/base.exception';
+import { UserRepository } from '@features/users/repositories/user.repository.interface';
+import { EmailService } from '@infrastructure/email/email.service';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -359,18 +359,18 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException if user not found', async () => {
       userRepository.findById.mockResolvedValue(null);
 
-      await expect(
-        service.refreshTokens(mockUser.id, 'token', 'jti'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshTokens(mockUser.id, 'token', 'jti')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException if stored token not found', async () => {
       userRepository.findById.mockResolvedValue(mockUser);
       refreshTokenRepository.findByJti.mockResolvedValue(null);
 
-      await expect(
-        service.refreshTokens(mockUser.id, 'token', 'jti'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshTokens(mockUser.id, 'token', 'jti')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException if token comparison fails', async () => {
@@ -387,9 +387,9 @@ describe('AuthService', () => {
       refreshTokenRepository.findByJti.mockResolvedValue(storedToken);
       passwordService.compare.mockResolvedValue(false);
 
-      await expect(
-        service.refreshTokens(mockUser.id, 'wrong-token', 'jti'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshTokens(mockUser.id, 'wrong-token', 'jti')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -419,28 +419,7 @@ describe('AuthService', () => {
     it('should throw NotFoundException if token not found', async () => {
       refreshTokenRepository.findByJti.mockResolvedValue(null);
 
-      await expect(service.revokeToken(mockUser.id, 'jti')).rejects.toThrow(
-        NotFoundException,
-      );
-    });
-  });
-
-  describe('getMe', () => {
-    it('should return user information', async () => {
-      userRepository.findById.mockResolvedValue(mockUser);
-
-      const result = await service.getMe(mockUser.id);
-
-      expect(result.id).toBe(mockUser.id);
-      expect(result.email).toBe(mockUser.email);
-      expect(result.name).toBe(mockUser.name);
-      expect(result).not.toHaveProperty('password');
-    });
-
-    it('should throw NotFoundException if user not found', async () => {
-      userRepository.findById.mockResolvedValue(null);
-
-      await expect(service.getMe('nonexistent-id')).rejects.toThrow(NotFoundException);
+      await expect(service.revokeToken(mockUser.id, 'jti')).rejects.toThrow(NotFoundException);
     });
   });
 });

@@ -10,12 +10,16 @@
   },
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "biome format --write ./src ./test",
+    "format:check": "biome format ./src ./test",
+    "lint": "biome lint --write ./src ./test",
+    "lint:check": "biome lint ./src ./test",
+    "check": "biome check --write ./src ./test",
+    "check:ci": "biome ci ./src ./test",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -24,7 +28,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "prepare": "husky"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.8",
@@ -49,6 +54,9 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.5",
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@nestjs/cli": "^11.0.10",
     "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^11.1.8",
@@ -58,7 +66,10 @@
     "@types/node": "^24.10.1",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.3",
+    "glob": "^11.0.3",
+    "husky": "^9.1.7",
     "jest": "^30.2.0",
+    "lint-staged": "^16.2.6",
     "prisma": "^6.19.0",
     "prisma-dbml-generator": "^0.12.0",
     "supertest": "^7.1.4",

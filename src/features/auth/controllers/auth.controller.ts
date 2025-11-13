@@ -1,20 +1,16 @@
-import { Controller, Post, Get, Body, UseGuards, Request } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiResponse,
-} from '@nestjs/swagger';
-import { AuthService } from '../services/auth.service';
-import {
-  RegisterDto,
-  LoginDto,
-  VerifyEmailDto,
-  ForgotPasswordDto,
-  ResetPasswordDto,
-} from '../dto/auth.dto';
 import { IsPublic } from '@common/decorators/public.decorator';
+import { AuthenticatedRequest, RefreshTokenRequest } from '@common/types/request.types';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+  VerifyEmailDto,
+} from '../dto/auth.dto';
+import { AuthService } from '../services/auth.service';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -74,7 +70,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Tokens refreshed' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  async refresh(@Request() req: any) {
+  async refresh(@Request() req: RefreshTokenRequest) {
     const { userId, jti, refreshToken } = req.user;
     return this.authService.refreshTokens(userId, refreshToken, jti);
   }
@@ -83,17 +79,8 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Revoke current token (logout)' })
   @ApiResponse({ status: 200, description: 'Token revoked' })
-  async revoke(@Request() req: any) {
+  async revoke(@Request() req: AuthenticatedRequest) {
     const { userId, jti } = req.user;
     return this.authService.revokeToken(userId, jti);
-  }
-
-  @Get('me')
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({ status: 200, description: 'User profile retrieved' })
-  async getMe(@Request() req: any) {
-    const { userId } = req.user;
-    return this.authService.getMe(userId);
   }
 }

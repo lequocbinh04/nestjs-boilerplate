@@ -1,26 +1,27 @@
+import { EnvConfig } from '@config/env.config';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { EnvConfig } from '@config/env.config';
 import { TokenPayload } from '../services/token.service';
 import { TokenRevocationService } from '../services/token-revocation.service';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   constructor(
-    private configService: ConfigService<EnvConfig>,
+    configService: ConfigService<EnvConfig>,
     private tokenRevocationService: TokenRevocationService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET')!,
+      secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET') ?? 'default-secret-key',
       passReqToCallback: true,
     });
   }
 
-  async validate(req: any, payload: TokenPayload) {
+  async validate(req: Request, payload: TokenPayload) {
     if (payload.type !== 'refresh') {
       throw new UnauthorizedException('Invalid token type');
     }
