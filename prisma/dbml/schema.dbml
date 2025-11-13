@@ -1,0 +1,44 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table RefreshToken {
+  id String [pk]
+  userId String [not null]
+  user User [not null]
+  token String [unique, not null]
+  jti String [unique, not null]
+  expiresAt DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table RevokedToken {
+  id String [pk]
+  userId String [not null]
+  user User [not null]
+  jti String [unique, not null]
+  revokedAt DateTime [default: `now()`, not null]
+  reason String
+  expiresAt DateTime [not null]
+}
+
+Table User {
+  id String [pk]
+  email String [unique, not null]
+  password String [not null]
+  name String
+  emailVerified Boolean [not null, default: false]
+  emailVerifiedAt DateTime
+  emailVerificationToken String
+  emailVerificationExpires DateTime
+  passwordResetToken String
+  passwordResetExpires DateTime
+  refreshTokens RefreshToken [not null]
+  revokedTokens RevokedToken [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Ref: RefreshToken.userId > User.id [delete: Cascade]
+
+Ref: RevokedToken.userId > User.id [delete: Cascade]

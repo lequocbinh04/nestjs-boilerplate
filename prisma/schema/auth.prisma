@@ -1,0 +1,30 @@
+model RefreshToken {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token          String   @unique
+  jti            String   @unique
+
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([jti])
+  @@index([expiresAt])
+}
+
+model RevokedToken {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  jti         String   @unique
+  revokedAt   DateTime @default(now())
+  reason      String?
+  expiresAt   DateTime
+
+  @@index([userId])
+  @@index([jti])
+  @@index([expiresAt])
+}
