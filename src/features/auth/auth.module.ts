@@ -1,43 +1,49 @@
-import { UsersModule } from '@features/users/users.module';
+import {
+  SHARED_ROLE_REPOSITORY,
+  SHARED_TOKEN_SERVICE,
+  SHARED_USER_REPOSITORY,
+} from '@common/di-token';
+import { RefreshTokenRepository } from '@common/repositories/shared-refresh-token.repository';
+import { RolePrismaRepository } from '@common/repositories/shared-role.repository';
+import { PrismaUserRepository } from '@common/repositories/shared-user.repository';
+import { TokenService } from '@common/services/token.service';
 import { EmailModule } from '@infrastructure/email/email.module';
-import { Module } from '@nestjs/common';
+import { Module, Provider } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { AuthController } from './controllers/auth.controller';
-import { RefreshTokenRepository } from './repositories/refresh-token.repository';
-import { RevokedTokenRepository } from './repositories/revoked-token.repository';
+import { AUTH_REPOSITORY, AUTH_SERVICE } from './auth.di-token';
+import { AuthController } from './infras/auth.controller';
+import { AuthPrismaRepository } from './infras/auth-prisma.repository';
 import { AuthService } from './services/auth.service';
 import { PasswordService } from './services/password.service';
-import { TokenService } from './services/token.service';
-import { TokenRevocationService } from './services/token-revocation.service';
-import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
+const dependencies: Provider[] = [
+  {
+    provide: SHARED_USER_REPOSITORY,
+    useClass: PrismaUserRepository,
+  },
+  {
+    provide: AUTH_SERVICE,
+    useClass: AuthService,
+  },
+  {
+    provide: SHARED_TOKEN_SERVICE,
+    useClass: TokenService,
+  },
+
+  {
+    provide: AUTH_REPOSITORY,
+    useClass: AuthPrismaRepository,
+  },
+  {
+    provide: SHARED_ROLE_REPOSITORY,
+    useClass: RolePrismaRepository,
+  },
+  PasswordService,
+  RefreshTokenRepository,
+];
 @Module({
-  imports: [
-    UsersModule,
-    EmailModule,
-    PassportModule.register({ defaultStrategy: 'jwt-access' }),
-    JwtModule.register({}),
-  ],
+  imports: [EmailModule, JwtModule],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    PasswordService,
-    TokenService,
-    TokenRevocationService,
-    RefreshTokenRepository,
-    RevokedTokenRepository,
-    JwtAccessStrategy,
-    JwtRefreshStrategy,
-  ],
-  exports: [
-    AuthService,
-    PasswordService,
-    TokenService,
-    TokenRevocationService,
-    RefreshTokenRepository,
-    RevokedTokenRepository,
-  ],
+  providers: dependencies,
 })
 export class AuthModule {}

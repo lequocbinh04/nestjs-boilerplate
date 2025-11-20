@@ -1,30 +1,20 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { ArgumentsHost, Catch, HttpException, Logger } from '@nestjs/common';
+import { BaseExceptionFilter } from '@nestjs/core';
+import { ZodSerializationException } from 'nestjs-zod';
+import { ZodError as ZodErrorV4 } from 'zod/v4';
 
 @Catch(HttpException)
-export class HttpExceptionFilter implements ExceptionFilter {
+export class HttpExceptionFilter extends BaseExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
 
   catch(exception: HttpException, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
-    const status = exception.getStatus();
-    const exceptionResponse = exception.getResponse();
+    if (exception instanceof ZodSerializationException) {
+      const zodError = exception.getZodError();
+      if (zodError instanceof ZodErrorV4) {
+        this.logger.error(`ZodSerializationException: ${zodError.message}`);
+      }
+    }
 
-    this.logger.error(`HTTP ${status} Error: ${request.method} ${request.url}`, exception.stack);
-
-    const errorResponse =
-      typeof exceptionResponse === 'string' ? { message: exceptionResponse } : exceptionResponse;
-
-    response.status(status).json({
-      success: false,
-      error: {
-        statusCode: status,
-        ...errorResponse,
-      },
-      timestamp: new Date().toISOString(),
-      path: request.url,
-    });
+    super.catch(exception, host);
   }
 }

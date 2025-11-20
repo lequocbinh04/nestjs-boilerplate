@@ -2,43 +2,164 @@
 //// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 //// ------------------------------------------------------
 
-Table RefreshToken {
-  id String [pk]
-  userId String [not null]
+Table Device {
+  id Int [pk, increment]
+  userId Int [not null]
   user User [not null]
+  userAgent String [not null]
+  ip String [not null]
+  lastActive DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+  isActive Boolean [not null, default: true]
+  refreshTokens RefreshToken [not null]
+}
+
+Table RefreshToken {
   token String [unique, not null]
-  jti String [unique, not null]
+  userId Int [not null]
+  user User [not null]
+  deviceId Int [not null]
+  device Device [not null]
   expiresAt DateTime [not null]
   createdAt DateTime [default: `now()`, not null]
-}
-
-Table RevokedToken {
-  id String [pk]
-  userId String [not null]
-  user User [not null]
   jti String [unique, not null]
-  revokedAt DateTime [default: `now()`, not null]
+  revokedAt DateTime
   reason String
-  expiresAt DateTime [not null]
 }
 
-Table User {
-  id String [pk]
-  email String [unique, not null]
-  password String [not null]
-  name String
-  emailVerified Boolean [not null, default: false]
-  emailVerifiedAt DateTime
-  emailVerificationToken String
-  emailVerificationExpires DateTime
-  passwordResetToken String
-  passwordResetExpires DateTime
-  refreshTokens RefreshToken [not null]
-  revokedTokens RevokedToken [not null]
+Table Permission {
+  id Int [pk, increment]
+  name String [not null]
+  description String [not null, default: '']
+  path String [not null]
+  method HTTPMethod [not null]
+  module String [not null, default: '']
+  roles Role [not null]
+  createdById Int
+  createdBy User
+  updatedById Int
+  updatedBy User
+  deletedById Int
+  deletedBy User
+  deletedAt DateTime
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
 
+Table Role {
+  id Int [pk, increment]
+  name String [not null]
+  description String [not null, default: '']
+  isActive Boolean [not null, default: true]
+  permissions Permission [not null]
+  users User [not null]
+  createdById Int
+  createdBy User
+  updatedById Int
+  updatedBy User
+  deletedById Int
+  deletedBy User
+  deletedAt DateTime
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table User {
+  id Int [pk, increment]
+  email String [unique, not null]
+  password String [not null]
+  name String [not null]
+  avatar String
+  totpSecret String
+  status UserStatus [not null, default: 'ACTIVE']
+  emailVerified Boolean [not null, default: false]
+  emailVerifiedAt DateTime
+  refreshTokens RefreshToken [not null]
+  devices Device [not null]
+  createdPermissions Permission [not null]
+  updatedPermissions Permission [not null]
+  deletedPermissions Permission [not null]
+  createdRoles Role [not null]
+  updatedRoles Role [not null]
+  deletedRoles Role [not null]
+  createdById Int
+  createdBy User
+  createdUsers User [not null]
+  updatedById Int
+  updatedBy User
+  updatedUsers User [not null]
+  deletedById Int
+  deletedBy User
+  deletedUsers User [not null]
+  deletedAt DateTime
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  role Role [not null]
+  roleId Int [not null]
+}
+
+Table VerificationCode {
+  id Int [pk, increment]
+  email String [not null]
+  code String [not null]
+  type VerificationCodeType [not null]
+  expiresAt DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (email, type) [unique]
+  }
+}
+
+Table PermissionToRole {
+  rolesId Int [ref: > Role.id]
+  permissionsId Int [ref: > Permission.id]
+}
+
+Enum HTTPMethod {
+  GET
+  POST
+  PUT
+  DELETE
+  PATCH
+  OPTIONS
+  HEAD
+}
+
+Enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+Enum VerificationCodeType {
+  REGISTER
+  FORGOT_PASSWORD
+  LOGIN
+  DISABLE_2FA
+}
+
+Ref: Device.userId > User.id [delete: Cascade]
+
 Ref: RefreshToken.userId > User.id [delete: Cascade]
 
-Ref: RevokedToken.userId > User.id [delete: Cascade]
+Ref: RefreshToken.deviceId > Device.id [delete: Cascade]
+
+Ref: Permission.createdById > User.id [delete: Set Null]
+
+Ref: Permission.updatedById > User.id [delete: Set Null]
+
+Ref: Permission.deletedById > User.id [delete: Set Null]
+
+Ref: Role.createdById > User.id
+
+Ref: Role.updatedById > User.id
+
+Ref: Role.deletedById > User.id
+
+Ref: User.createdById - User.id [delete: Set Null]
+
+Ref: User.updatedById - User.id [delete: Set Null]
+
+Ref: User.deletedById - User.id [delete: Set Null]
+
+Ref: User.roleId > Role.id

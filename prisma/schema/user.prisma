@@ -1,24 +1,49 @@
 model User {
-  id                 String    @id @default(cuid())
-  email              String    @unique
-  password           String
-  name               String?
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  password   String
+  name       String
+  avatar     String?
+  totpSecret String?
+  status     UserStatus @default(ACTIVE)
 
-  emailVerified      Boolean   @default(false)
-  emailVerifiedAt    DateTime?
-  emailVerificationToken String?
-  emailVerificationExpires DateTime?
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
 
-  passwordResetToken String?
-  passwordResetExpires DateTime?
+  refreshTokens RefreshToken[]
+  devices       Device[]
 
-  refreshTokens      RefreshToken[]
-  revokedTokens      RevokedToken[]
+  createdPermissions Permission[] @relation("PermissionCreatedBy")
+  updatedPermissions Permission[] @relation("PermissionUpdatedBy")
+  deletedPermissions Permission[] @relation("PermissionDeletedBy")
+  createdRoles       Role[]       @relation("RoleCreatedBy")
+  updatedRoles       Role[]       @relation("RoleUpdatedBy")
+  deletedRoles       Role[]       @relation("RoleDeletedBy")
 
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  // 1 user có thể tạo ra nhiều user khác
+  // 1 user chỉ có thể được tạo ra bởi 1 user khác
+  // Tự quan hệ 1-n
+  createdById  Int?
+  createdBy    User?  @relation("CreatorUsers", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  createdUsers User[] @relation("CreatorUsers")
+
+  updatedById  Int?
+  updatedBy    User?  @relation("UpdatorUsers", fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  updatedUsers User[] @relation("UpdatorUsers")
+  deletedById  Int?
+  deletedBy    User?  @relation("DeletorUsers", fields: [deletedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  deletedUsers User[] @relation("DeletorUsers")
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  role      Role      @relation(fields: [roleId], references: [id])
+  roleId    Int
 
   @@index([email])
-  @@index([emailVerificationToken])
-  @@index([passwordResetToken])
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
 }

@@ -2,7 +2,7 @@ import { Request } from 'express';
 
 export interface AuthenticatedRequest extends Request {
   user: {
-    userId: string;
+    userId: number;
     email: string;
     jti: string;
   };
@@ -10,7 +10,7 @@ export interface AuthenticatedRequest extends Request {
 
 export interface RefreshTokenRequest extends Request {
   user: {
-    userId: string;
+    userId: number;
     email: string;
     jti: string;
     refreshToken: string;
