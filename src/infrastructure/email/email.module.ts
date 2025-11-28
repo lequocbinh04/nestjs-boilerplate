@@ -1,8 +1,14 @@
 import { Module } from '@nestjs/common';
-import { EmailService } from './email.service';
+import { EMAIL_SERVICE } from './email.di-token';
+import { ResendEmailService } from './email.service';
 
 @Module({
-  providers: [EmailService],
-  exports: [EmailService],
+  providers: [
+    {
+      provide: EMAIL_SERVICE,
+      useClass: ResendEmailService,
+    },
+  ],
+  exports: [EMAIL_SERVICE],
 })
 export class EmailModule {}

@@ -9,7 +9,8 @@ import { ISharedRoleRepository } from '@common/port/shared-role.port';
 import { ITokenService } from '@common/port/shared-token.port';
 import { ISharedUserRepository } from '@common/port/shared-user.port';
 import { EnvConfig } from '@config/env.config';
-import { EmailService } from '@infrastructure/email/email.service';
+import { EMAIL_SERVICE } from '@infrastructure/email/email.di-token';
+import { IEmailService } from '@infrastructure/email/email.port';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { VerificationCodeService } from '@shared/verification-code/verification-code.service';
@@ -29,9 +30,9 @@ export class AuthService implements IAuthService {
     @Inject(SHARED_TOKEN_SERVICE) private tokenService: ITokenService,
     @Inject(AUTH_REPOSITORY) private authRepository: IAuthRepository,
     @Inject(SHARED_ROLE_REPOSITORY) private roleRepository: ISharedRoleRepository,
+    @Inject(EMAIL_SERVICE) private emailService: IEmailService,
 
     private passwordService: PasswordService,
-    private emailService: EmailService,
     private configService: ConfigService<EnvConfig>,
     private verificationCodeService: VerificationCodeService,
   ) {}

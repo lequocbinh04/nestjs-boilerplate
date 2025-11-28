@@ -9,8 +9,8 @@
     "schema": "prisma/schema"
   },
   "scripts": {
-    "init-seed-data": "ts-node script",
-    "create-permissions": "ts-node initialScript/create-permissions.ts",
+    "init-seed-data": "ts-node scripts",
+    "create-permissions": "ts-node scripts/create-permissions.ts",
     "build": "nest build",
     "format": "biome format --write ./src ./test",
     "format:check": "biome format ./src ./test",

@@ -6,8 +6,8 @@ import { getPasswordResetEmailTemplate } from './templates/password-reset-email'
 import { getVerificationEmailTemplate } from './templates/verification-email';
 
 @Injectable()
-export class EmailService {
-  private readonly logger = new Logger(EmailService.name);
+export class ResendEmailService {
+  private readonly logger = new Logger(ResendEmailService.name);
   private resend: Resend | null;
   private fromEmail: string;
 

@@ -26,7 +26,7 @@
       "@infrastructure/*": ["src/infrastructure/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "scripts/**/*"],
   "exclude": ["node_modules", "dist", "test"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]

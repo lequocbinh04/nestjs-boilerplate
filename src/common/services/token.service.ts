@@ -1,7 +1,8 @@
+import { SHARED_REFRESH_TOKEN_REPOSITORY } from '@common/di-token';
 import { ITokenService } from '@common/port/shared-token.port';
 import { RefreshTokenRepository } from '@common/repositories/shared-refresh-token.repository';
 import { EnvConfig } from '@config/env.config';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,9 +16,9 @@ import {
 @Injectable()
 export class TokenService implements ITokenService {
   constructor(
+    @Inject(SHARED_REFRESH_TOKEN_REPOSITORY) private refreshTokenRepository: RefreshTokenRepository,
     private readonly jwtService: JwtService,
     private configService: ConfigService<EnvConfig>,
-    private refreshTokenRepository: RefreshTokenRepository,
   ) {}
 
   signAccessToken(payload: AccessTokenPayloadCreate) {

@@ -1,4 +1,5 @@
 import {
+  SHARED_REFRESH_TOKEN_REPOSITORY,
   SHARED_ROLE_REPOSITORY,
   SHARED_TOKEN_SERVICE,
   SHARED_USER_REPOSITORY,
@@ -38,8 +39,11 @@ const dependencies: Provider[] = [
     provide: SHARED_ROLE_REPOSITORY,
     useClass: RolePrismaRepository,
   },
+  {
+    provide: SHARED_REFRESH_TOKEN_REPOSITORY,
+    useClass: RefreshTokenRepository,
+  },
   PasswordService,
-  RefreshTokenRepository,
 ];
 @Module({
   imports: [EmailModule, JwtModule],
