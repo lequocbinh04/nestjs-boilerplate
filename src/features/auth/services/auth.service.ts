@@ -3,7 +3,7 @@ import {
   SHARED_TOKEN_SERVICE,
   SHARED_USER_REPOSITORY,
 } from '@common/di-token';
-import { ConflictException, UnauthorizedException } from '@common/exceptions/base.exception';
+import { AppError, ErrInternalServer } from '@common/exceptions/app-error';
 import { UserType } from '@common/models/shared-user.model';
 import { ISharedRoleRepository } from '@common/port/shared-role.port';
 import { ITokenService } from '@common/port/shared-token.port';
@@ -11,13 +11,20 @@ import { ISharedUserRepository } from '@common/port/shared-user.port';
 import { EnvConfig } from '@config/env.config';
 import { EMAIL_SERVICE } from '@infrastructure/email/email.di-token';
 import { IEmailService } from '@infrastructure/email/email.port';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { VerificationCodeService } from '@shared/verification-code/verification-code.service';
 import { VerificationCodeType } from '@shared/verification-code/verification-code.type';
 import ms from 'ms';
 import { AUTH_REPOSITORY } from '../auth.di-token';
-import { LoginBodyType, RegisterBodyType, RegisterResType } from '../auth.model';
+import {
+  ErrEmailAlreadyExists,
+  ErrEmailNotVerified,
+  ErrInvalidCredentials,
+  LoginBodyType,
+  RegisterBodyType,
+  RegisterResType,
+} from '../auth.model';
 import { IAuthRepository, IAuthService } from '../auth.port';
 import { PasswordService } from './password.service';
 
@@ -44,7 +51,7 @@ export class AuthService implements IAuthService {
     try {
       const existingUser = await this.userRepository.findByEmail(body.email);
       if (existingUser) {
-        throw new ConflictException('Email already registered');
+        throw ErrEmailAlreadyExists;
       }
 
       const hashedPassword = await this.passwordService.hash(body.password);
@@ -88,19 +95,19 @@ export class AuthService implements IAuthService {
     // 1. Get user to check information
     const user = await this.userRepository.findByEmailIncludeRole(dto.email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw ErrInvalidCredentials;
     }
 
     const isPasswordValid = await this.passwordService.compare(dto.password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw ErrInvalidCredentials;
     }
 
     const emailVerificationRequired = this.configService.get('EMAIL_VERIFICATION_REQUIRED', {
       infer: true,
     });
     if (emailVerificationRequired && !user.emailVerified) {
-      throw new UnauthorizedException('Please verify your email before logging in');
+      throw ErrEmailNotVerified;
     }
 
     // 2. Tạo mới device
