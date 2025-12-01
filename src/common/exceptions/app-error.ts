@@ -110,7 +110,10 @@ export const responseErr = (err: Error, res: Response, requestId?: string) => {
       appErr.withDetail(issue.path.join('.'), issue.message);
     });
 
-    res.status(appErr.getStatusCode()).json(appErr.toJSON(isProduction));
+    res.status(appErr.getStatusCode()).json({
+      ...appErr.toJSON(isProduction),
+      traceId: requestId,
+    });
     return;
   }
 
