@@ -1,4 +1,4 @@
-import { IsPublic } from '@common/decorators/public.decorator';
+import { IsPublic } from '@common/decorators/auth.decorator';
 import { UserAgent } from '@common/decorators/user-agent.decorator';
 import { Body, Controller, Inject, Ip, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';

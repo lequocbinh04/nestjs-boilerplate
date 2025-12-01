@@ -34,6 +34,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@keyv/redis": "^5.1.4",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.1.8",
     "@nestjs/config": "^4.0.2",

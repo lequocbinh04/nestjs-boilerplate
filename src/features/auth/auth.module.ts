@@ -30,7 +30,6 @@ const dependencies: Provider[] = [
     provide: SHARED_TOKEN_SERVICE,
     useClass: TokenService,
   },
-
   {
     provide: AUTH_REPOSITORY,
     useClass: AuthPrismaRepository,

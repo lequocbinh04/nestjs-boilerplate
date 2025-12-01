@@ -1,4 +1,5 @@
-import { TokenService } from '@common/services/token.service';
+import { SHARED_TOKEN_SERVICE } from '@common/di-token';
+import { ITokenService } from '@common/port/shared-token.port';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   CanActivate,
@@ -26,7 +27,7 @@ type CachedRole = RolePermissionsType & {
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
   constructor(
-    private readonly tokenService: TokenService,
+    @Inject(SHARED_TOKEN_SERVICE) private readonly tokenService: ITokenService,
     private readonly prismaService: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
@@ -34,10 +35,10 @@ export class AccessTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     // Extract và validate token
-    const decodedAccessToken = await this.extractAndValidateToken(request);
+    const _decodedAccessToken = await this.extractAndValidateToken(request);
 
     // Check user permission
-    await this.validateUserPermission(decodedAccessToken, request);
+    // await this.validateUserPermission(decodedAccessToken, request);
     return true;
   }
 

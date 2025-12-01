@@ -1,9 +1,23 @@
+import {
+  AuthType,
+  AuthTypeType,
+  ConditionGuard,
+  ConditionGuardType,
+} from '@common/constants/auth.constant';
 import { SetMetadata } from '@nestjs/common';
 
-export enum AuthType {
-  Bearer = 'Bearer',
-  None = 'None',
-}
-
 export const AUTH_TYPE_KEY = 'authType';
-export const Auth = (types: AuthType[] = [AuthType.Bearer]) => SetMetadata(AUTH_TYPE_KEY, types);
+
+export type AuthTypeDecoratorPayload = {
+  authTypes: AuthTypeType[];
+  options: { condition: ConditionGuardType };
+};
+
+export const Auth = (authTypes: AuthTypeType[], options?: { condition: ConditionGuardType }) => {
+  return SetMetadata(AUTH_TYPE_KEY, {
+    authTypes,
+    options: options ?? { condition: ConditionGuard.And },
+  });
+};
+
+export const IsPublic = () => Auth([AuthType.None]);
