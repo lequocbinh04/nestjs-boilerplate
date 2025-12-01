@@ -19,7 +19,9 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { SharedModule } from '@shared/shared.module';
+import { ClsModule } from 'nestjs-cls';
 import { ZodSerializerInterceptor } from 'nestjs-zod';
+import { v4 as uuidv4 } from 'uuid';
 
 @Module({
   imports: [
@@ -35,6 +37,14 @@ import { ZodSerializerInterceptor } from 'nestjs-zod';
         return {
           stores: [createKeyv(process.env.REDIS_URL)],
         };
+      },
+    }),
+    ClsModule.forRoot({
+      global: true,
+      middleware: {
+        mount: true,
+        generateId: true,
+        idGenerator: (req) => req.headers['X-Request-Id'] ?? uuidv4(),
       },
     }),
     HealthModule,

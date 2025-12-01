@@ -1,3 +1,4 @@
+import { HttpExceptionFilter } from '@common/filters/http-exception.filter';
 import { EnvConfig } from '@config/env.config';
 import { setupSwagger } from '@config/swagger.config';
 import { Logger } from '@nestjs/common';

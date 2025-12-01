@@ -89,13 +89,16 @@ export class AppError extends Error {
 }
 
 // Util error function
-export const responseErr = (err: Error, res: Response) => {
+export const responseErr = (err: Error, res: Response, requestId?: string) => {
   const isProduction = process.env.NODE_ENV === 'production';
   !isProduction && console.error(err.stack);
 
   if (err instanceof AppError) {
     const appErr = err as AppError;
-    res.status(appErr.getStatusCode()).json(appErr.toJSON(isProduction));
+    res.status(appErr.getStatusCode()).json({
+      ...appErr.toJSON(isProduction),
+      traceId: requestId,
+    });
     return;
   }
 
@@ -112,7 +115,10 @@ export const responseErr = (err: Error, res: Response) => {
   }
 
   const appErr = ErrInternalServer.wrap(err);
-  res.status(appErr.getStatusCode()).json(appErr.toJSON(isProduction));
+  res.status(appErr.getStatusCode()).json({
+    ...appErr.toJSON(isProduction),
+    traceId: requestId,
+  });
 };
 
 // Common Error
