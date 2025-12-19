@@ -1,3 +1,4 @@
+import { IsPublic } from '@common/decorators/auth.decorator';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
@@ -6,6 +7,7 @@ import { RedisHealthIndicator } from '@shared/redis/redis.health';
 
 @ApiTags('Health')
 @Controller('health')
+@IsPublic()
 export class HealthController {
   constructor(
     private health: HealthCheckService,
