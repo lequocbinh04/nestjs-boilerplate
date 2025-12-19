@@ -1,3 +1,4 @@
+import { TypeOfVerificationCode } from '@common/constants/auth.constant';
 import {
   SHARED_ROLE_REPOSITORY,
   SHARED_TOKEN_SERVICE,
@@ -17,8 +18,19 @@ import { VerificationCodeService } from '@shared/verification-code/verification-
 import { VerificationCodeType } from '@shared/verification-code/verification-code.type';
 import ms from 'ms';
 import { AUTH_REPOSITORY } from '../auth.di-token';
-import { ErrEmailAlreadyExists, ErrEmailNotVerified, ErrInvalidCredentials } from '../auth.error';
-import { LoginBodyType, RegisterBodyType, RegisterResType, VerifyEmailType } from '../auth.model';
+import {
+  ErrEmailAlreadyExists,
+  ErrEmailNotExists,
+  ErrEmailNotVerified,
+  ErrInvalidCredentials,
+} from '../auth.error';
+import {
+  LoginBodyType,
+  RegisterBodyType,
+  RegisterResType,
+  SendOtpEmailType,
+  VerifyEmailType,
+} from '../auth.model';
 import { IAuthRepository, IAuthService } from '../auth.port';
 import { PasswordService } from './password.service';
 
@@ -134,6 +146,22 @@ export class AuthService implements IAuthService {
     });
 
     await this.userRepository.verifyEmail({ email: body.email });
+  }
+
+  async sendOtpEmail(body: SendOtpEmailType): Promise<void> {
+    const existingUser = await this.userRepository.findByEmail(body.email);
+    if (existingUser && body.type === TypeOfVerificationCode.REGISTER) {
+      throw ErrEmailAlreadyExists;
+    } else if (!existingUser && body.type !== TypeOfVerificationCode.REGISTER) {
+      throw ErrEmailNotExists;
+    }
+
+    const verificationToken = await this.verificationCodeService.createVerificationCode(
+      body.email,
+      body.type,
+      body.expiresAt as ms.StringValue,
+    );
+    await this.emailService.sendVerificationEmail(body.email, verificationToken.code);
   }
 
   // async forgotPassword(dto: ForgotPasswordDto) {

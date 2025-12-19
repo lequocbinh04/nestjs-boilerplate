@@ -4,6 +4,7 @@ import {
   LoginResSchema,
   RegisterBodySchema,
   RegisterResSchema,
+  ResendOTPVerifyEmailSchema,
   VerifyEmailSchema,
 } from './auth.model';
 
@@ -14,3 +15,4 @@ export class LoginBodyDTO extends createZodDto(LoginBodySchema) {}
 export class LoginResDTO extends createZodDto(LoginResSchema) {}
 
 export class VerifyEmailBodyDTO extends createZodDto(VerifyEmailSchema) {}
+export class ResendOTPVerifyEmailBodyDTO extends createZodDto(ResendOTPVerifyEmailSchema) {}

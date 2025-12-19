@@ -1,3 +1,4 @@
+import { TypeOfVerificationCode } from '@common/constants/auth.constant';
 import { IsPublic } from '@common/decorators/auth.decorator';
 import { UserAgent } from '@common/decorators/user-agent.decorator';
 import { Body, Controller, Inject, Ip, Post } from '@nestjs/common';
@@ -9,6 +10,7 @@ import {
   LoginResDTO,
   RegisterBodyDTO,
   RegisterResDTO,
+  ResendOTPVerifyEmailBodyDTO,
   VerifyEmailBodyDTO,
 } from '../auth.dto';
 import { VerifyEmailType } from '../auth.model';
@@ -50,6 +52,20 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   async verifyEmail(@Body() dto: VerifyEmailBodyDTO) {
     return this.authService.verifyEmail(dto);
+  }
+
+  @Post('send-otp-email')
+  @IsPublic()
+  @ApiOperation({ summary: 'Send OTP email' })
+  @ApiResponse({ status: 200, description: 'OTP email sent' })
+  @ApiResponse({ status: 400, description: 'Invalid email format' })
+  async sendOtpEmail(@Body() dto: ResendOTPVerifyEmailBodyDTO) {
+    await this.authService.sendOtpEmail({
+      email: dto.email,
+      type: TypeOfVerificationCode.REGISTER,
+      expiresAt: '24h',
+    });
+    return { success: true };
   }
 
   // @Post('forgot-password')

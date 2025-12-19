@@ -1,6 +1,8 @@
+import { TypeOfVerificationCode } from '@common/constants/auth.constant';
 import { AppError } from '@common/exceptions/app-error';
 import { UserSchema } from '@common/models/shared-user.model';
 import { HttpStatus } from '@nestjs/common';
+import { VerificationCodeType } from '@prisma/client';
 import { z } from 'zod';
 
 export const RegisterBodySchema = UserSchema.pick({
@@ -48,6 +50,16 @@ export const VerifyEmailSchema = z.object({
   otp: z.string().min(1, 'OTP is required'),
 });
 
+export const SendOtpEmailSchema = z.object({
+  email: z.email('Invalid email format'),
+  type: z.enum(TypeOfVerificationCode),
+  expiresAt: z.string().min(1, 'Expires at is required'),
+});
+
+export const ResendOTPVerifyEmailSchema = z.object({
+  email: z.email('Invalid email format'),
+});
+
 export const ForgotPasswordSchema = z.object({
   email: z.email('Invalid email format'),
 });
@@ -75,6 +87,9 @@ export type RegisterResType = z.infer<typeof RegisterResSchema>;
 export type LoginBodyType = z.infer<typeof LoginBodySchema>;
 export type LoginResType = z.infer<typeof LoginResSchema>;
 export type VerifyEmailType = z.infer<typeof VerifyEmailSchema>;
+export type SendOtpEmailType = z.infer<typeof SendOtpEmailSchema>;
+export type ResendOTPVerifyEmailType = z.infer<typeof ResendOTPVerifyEmailSchema>;
+
 export type ForgotPasswordDto = z.infer<typeof ForgotPasswordSchema>;
 export type ResetPasswordDto = z.infer<typeof ResetPasswordSchema>;
 export type RefreshTokenDto = z.infer<typeof RefreshTokenSchema>;

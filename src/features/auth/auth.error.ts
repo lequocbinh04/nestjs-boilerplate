@@ -6,6 +6,13 @@ export const ErrEmailAlreadyExists = AppError.from(
   HttpStatus.CONFLICT,
   'EMAIL_ALREADY_EXISTS',
 );
+
+export const ErrEmailNotExists = AppError.from(
+  new Error('Email not exists'),
+  HttpStatus.NOT_FOUND,
+  'EMAIL_NOT_EXISTS',
+);
+
 export const ErrInvalidCredentials = AppError.from(
   new Error('Invalid email or password'),
   HttpStatus.UNAUTHORIZED,
