@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@shared/database/prisma.service';
 import { addMilliseconds } from 'date-fns';
 import ms from 'ms';
-import { InvalidOTPException, OTPExpiredException } from './verification-code.error';
+import { ErrInvalidOTP, ErrOTPExpired } from './verification-code.error';
 import { TypeOfVerificationCodeType } from './verification-code.type';
 
 @Injectable()
@@ -26,11 +26,11 @@ export class VerificationCodeRepository {
     });
 
     if (!verificationCode || verificationCode.code !== code) {
-      throw InvalidOTPException;
+      throw ErrInvalidOTP;
     }
 
     if (verificationCode.expiresAt < new Date()) {
-      throw OTPExpiredException;
+      throw ErrOTPExpired;
     }
 
     return verificationCode;

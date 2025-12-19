@@ -17,14 +17,8 @@ import { VerificationCodeService } from '@shared/verification-code/verification-
 import { VerificationCodeType } from '@shared/verification-code/verification-code.type';
 import ms from 'ms';
 import { AUTH_REPOSITORY } from '../auth.di-token';
-import {
-  ErrEmailAlreadyExists,
-  ErrEmailNotVerified,
-  ErrInvalidCredentials,
-  LoginBodyType,
-  RegisterBodyType,
-  RegisterResType,
-} from '../auth.model';
+import { ErrEmailAlreadyExists, ErrEmailNotVerified, ErrInvalidCredentials } from '../auth.error';
+import { LoginBodyType, RegisterBodyType, RegisterResType, VerifyEmailType } from '../auth.model';
 import { IAuthRepository, IAuthService } from '../auth.port';
 import { PasswordService } from './password.service';
 
@@ -132,20 +126,15 @@ export class AuthService implements IAuthService {
     };
   }
 
-  // async verifyEmail(dto: VerifyEmailDto) {
-  //   const user = await this.userRepository.findByEmailVerificationToken(dto.token);
-  //   if (!user) {
-  //     throw new BadRequestException('Invalid or expired verification token');
-  //   }
+  async verifyEmail(body: VerifyEmailType) {
+    await this.verificationCodeService.validateVerificationCode({
+      email: body.email,
+      type: VerificationCodeType.REGISTER,
+      code: body.otp,
+    });
 
-  //   if (!user.isEmailVerificationValid()) {
-  //     throw new BadRequestException('Verification token has expired');
-  //   }
-
-  //   await this.userRepository.verifyEmail(user.id);
-
-  //   return { message: 'Email verified successfully' };
-  // }
+    await this.userRepository.verifyEmail({ email: body.email });
+  }
 
   // async forgotPassword(dto: ForgotPasswordDto) {
   //   const user = await this.userRepository.findByEmail(dto.email);

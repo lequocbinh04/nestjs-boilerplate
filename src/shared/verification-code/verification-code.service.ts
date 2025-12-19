@@ -9,7 +9,7 @@ export class VerificationCodeService {
   constructor(private readonly verificationCodeRepository: VerificationCodeRepository) {}
 
   generateOTP(): string {
-    return String(randomInt(100000, 1000000));
+    return String(randomInt(100000, 1000000)); // generate 6 digits random number
   }
 
   validateVerificationCode({
@@ -30,6 +30,7 @@ export class VerificationCodeService {
     expiresAt: ms.StringValue,
   ) {
     const otp = this.generateOTP();
+
     const verifycationCode = await this.verificationCodeRepository.createVerificationCode(
       email,
       otp,

@@ -4,7 +4,14 @@ import { Body, Controller, Inject, Ip, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { AUTH_SERVICE } from '../auth.di-token';
-import { LoginBodyDTO, LoginResDTO, RegisterBodyDTO, RegisterResDTO } from '../auth.dto';
+import {
+  LoginBodyDTO,
+  LoginResDTO,
+  RegisterBodyDTO,
+  RegisterResDTO,
+  VerifyEmailBodyDTO,
+} from '../auth.dto';
+import { VerifyEmailType } from '../auth.model';
 import { IAuthService } from '../auth.port';
 
 @ApiTags('Authentication')
@@ -36,14 +43,14 @@ export class AuthController {
     });
   }
 
-  // @Post('verify-email')
-  // @IsPublic()
-  // @ApiOperation({ summary: 'Verify email address' })
-  // @ApiResponse({ status: 200, description: 'Email verified' })
-  // @ApiResponse({ status: 400, description: 'Invalid or expired token' })
-  // async verifyEmail(@Body() dto: VerifyEmailDto) {
-  //   return this.authService.verifyEmail(dto);
-  // }
+  @Post('verify-email')
+  @IsPublic()
+  @ApiOperation({ summary: 'Verify email address' })
+  @ApiResponse({ status: 200, description: 'Email verified' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  async verifyEmail(@Body() dto: VerifyEmailBodyDTO) {
+    return this.authService.verifyEmail(dto);
+  }
 
   // @Post('forgot-password')
   // @IsPublic()

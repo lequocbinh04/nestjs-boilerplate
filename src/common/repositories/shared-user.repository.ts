@@ -62,9 +62,9 @@ export class PrismaUserRepository implements ISharedUserRepository {
     });
   }
 
-  async verifyEmail(userId: number): Promise<void> {
+  async verifyEmail(uniqueValue: { id: number } | { email: string }): Promise<void> {
     await this.prisma.user.update({
-      where: { id: userId },
+      where: uniqueValue,
       data: {
         emailVerified: true,
         emailVerifiedAt: new Date(),

@@ -3,22 +3,6 @@ import { UserSchema } from '@common/models/shared-user.model';
 import { HttpStatus } from '@nestjs/common';
 import { z } from 'zod';
 
-export const ErrEmailAlreadyExists = AppError.from(
-  new Error('Email already exists'),
-  HttpStatus.CONFLICT,
-  'EMAIL_ALREADY_EXISTS',
-);
-export const ErrInvalidCredentials = AppError.from(
-  new Error('Invalid email or password'),
-  HttpStatus.UNAUTHORIZED,
-  'INVALID_CREDENTIALS',
-);
-export const ErrEmailNotVerified = AppError.from(
-  new Error('Email not verified'),
-  HttpStatus.FORBIDDEN,
-  'EMAIL_NOT_VERIFIED',
-);
-
 export const RegisterBodySchema = UserSchema.pick({
   email: true,
   password: true,
@@ -60,7 +44,8 @@ export const LoginResSchema = z.object({
 });
 
 export const VerifyEmailSchema = z.object({
-  token: z.string().min(1, 'Token is required'),
+  email: z.email('Invalid email format'),
+  otp: z.string().min(1, 'OTP is required'),
 });
 
 export const ForgotPasswordSchema = z.object({
@@ -89,7 +74,7 @@ export type RegisterBodyType = z.infer<typeof RegisterBodySchema>;
 export type RegisterResType = z.infer<typeof RegisterResSchema>;
 export type LoginBodyType = z.infer<typeof LoginBodySchema>;
 export type LoginResType = z.infer<typeof LoginResSchema>;
-export type VerifyEmailDto = z.infer<typeof VerifyEmailSchema>;
+export type VerifyEmailType = z.infer<typeof VerifyEmailSchema>;
 export type ForgotPasswordDto = z.infer<typeof ForgotPasswordSchema>;
 export type ResetPasswordDto = z.infer<typeof ResetPasswordSchema>;
 export type RefreshTokenDto = z.infer<typeof RefreshTokenSchema>;

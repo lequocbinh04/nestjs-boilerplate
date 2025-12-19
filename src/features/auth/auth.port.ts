@@ -4,11 +4,13 @@ import {
   LoginResType,
   RegisterBodyType,
   RegisterResType,
+  VerifyEmailType,
 } from './auth.model';
 
 export interface IAuthService {
   register(body: RegisterBodyType): Promise<RegisterResType>;
   login(dto: LoginBodyType & { userAgent: string; ip: string }): Promise<LoginResType>;
+  verifyEmail(body: VerifyEmailType): Promise<void>; // throw when error
 }
 
 export interface IAuthRepository extends IAuthQueryRepository, IAuthCommandRepository {}

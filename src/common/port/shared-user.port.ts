@@ -20,5 +20,5 @@ export interface ISharedUserCommandRepository {
   }): Promise<UserType>;
   update(id: number, data: Partial<UserType>): Promise<UserType>;
   delete(id: number): Promise<void>;
-  verifyEmail(userId: number): Promise<void>;
+  verifyEmail(uniqueValue: { id: number } | { email: string }): Promise<void>;
 }

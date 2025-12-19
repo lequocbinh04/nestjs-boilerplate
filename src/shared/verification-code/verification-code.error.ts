@@ -1,17 +1,14 @@
-import { UnprocessableEntityException } from '@nestjs/common';
+import { AppError } from '@common/exceptions/app-error';
+import { HttpStatus, UnprocessableEntityException } from '@nestjs/common';
 
-export const InvalidOTPException = new UnprocessableEntityException([
-  {
-    code: 'Error.InvalidOTP',
-    message: 'Invalid OTP',
-    path: 'code',
-  },
-]);
+export const ErrInvalidOTP = AppError.from(
+  new Error('Invalid OTP'),
+  HttpStatus.UNPROCESSABLE_ENTITY,
+  'INVALID_OTP',
+);
 
-export const OTPExpiredException = new UnprocessableEntityException([
-  {
-    code: 'Error.OTPExpired',
-    message: 'OTP has expired',
-    path: 'code',
-  },
-]);
+export const ErrOTPExpired = AppError.from(
+  new Error('OTP has expired'),
+  HttpStatus.UNPROCESSABLE_ENTITY,
+  'OTP_EXPIRED',
+);
