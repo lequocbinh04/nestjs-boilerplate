@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { ZodResponse } from 'nestjs-zod';
 import { UserService } from '../services/user.service';
 import { GetMeResDTO } from '../user.dto';
+import { GetMeResSchema } from '../user.model';
 
 @ApiTags('Users')
 @Controller('users')
@@ -18,7 +19,6 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User profile retrieved' })
   @ZodResponse({ type: GetMeResDTO })
   async getMe(@CurrentUser() user: UserType) {
-    console.log(user);
-    return user;
+    return JSON.parse(JSON.stringify(user));
   }
 }
