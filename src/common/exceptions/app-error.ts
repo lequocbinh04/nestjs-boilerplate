@@ -8,6 +8,7 @@ export class AppError extends Error {
   private rootCause?: Error;
 
   private details: Record<string, any> = {};
+  private internalDetails: Record<string, any> = {}; // Not expose when production and pass to sentry
   private logMessage?: string;
   private code?: string;
 
@@ -48,6 +49,11 @@ export class AppError extends Error {
     return this;
   }
 
+  withInternalDetail(key: string, value: any): AppError {
+    this.internalDetails[key] = value;
+    return this;
+  }
+
   withCode(code: string): AppError {
     this.code = code;
     return this;
@@ -79,6 +85,7 @@ export class AppError extends Error {
           code: this.code,
           rootCause: rootCause ? rootCause.message : this.message,
           details: this.details,
+          internalDetails: this.internalDetails,
           logMessage: this.logMessage,
         };
   }
